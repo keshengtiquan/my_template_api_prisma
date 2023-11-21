@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE `sys_user` MODIFY `email` VARCHAR(60) NULL DEFAULT '',
+    MODIFY `gender` CHAR(1) NULL DEFAULT '0',
+    MODIFY `status` CHAR(1) NULL DEFAULT '0',
+    MODIFY `remark` VARCHAR(500) NULL DEFAULT 'null',
+    MODIFY `create_time` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    MODIFY `update_time` DATETIME(3) NULL,
+    MODIFY `phone_number` VARCHAR(11) NULL DEFAULT '',
+    MODIFY `tenant_id` BIGINT NULL DEFAULT 0;

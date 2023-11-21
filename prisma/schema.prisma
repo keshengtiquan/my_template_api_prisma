@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 系统用户角色
+model sys_user {
+  id          Int             @id @default(autoincrement())
+  tenantId    Int             @default(0) @map("tenant_id")
+  deptId      Int?            @map("dept_id")
+  userName    String          @map("user_name") @db.VarChar(30)
+  nickName    String          @map("nick_name") @db.VarChar(30)
+  email       String          @default("") @db.VarChar(60)
+  phoneNumber String          @default("") @map("phone_number") @db.VarChar(11)
+  gender      String          @default("0") @db.Char(1)
+  avatar      String?         @db.VarChar(255)
+  password    String          @default("") @db.VarChar(100)
+  status      String          @default("0") @db.Char(1)
+  remark      String          @default("null") @db.VarChar(500)
+  createBy    String?         @map("create_by") @db.VarChar(255)
+  updateBy    String?         @map("update_by") @db.VarChar(255)
+  createTime  DateTime        @default(now()) @map("create_time")
+  updateTime  DateTime        @updatedAt @map("update_time")
+  roles       sys_user_role[]
+}
+
+// 系统角色
+model sys_role {
+  id         Int             @id @default(autoincrement())
+  tenantId   Int             @default(0) @map("tenant_id")
+  roleName   String          @map("role_name_cn") @db.VarChar(30)
+  roleKey    String          @map("role_key") @db.VarChar(100)
+  roleSort   Int             @map("role_sort")
+  dataScope  String          @default("1") @map("data_scope") @db.Char(1)
+  status     String          @default("0") @db.Char(1)
+  remark     String?         @db.VarChar(500)
+  createBy   String?         @map("create_by") @db.VarChar(255)
+  updateBy   String?         @map("update_by") @db.VarChar(255)
+  createTime DateTime        @default(now()) @map("create_time")
+  updateTime DateTime        @updatedAt @map("update_time")
+  users      sys_user_role[]
+  menus      sys_menu_role[]
+}
+
+// 用户角色表
+model sys_user_role {
+  user_id Int
+  user    sys_user @relation(fields: [user_id], references: [id])
+  role_id Int
+  role    sys_role @relation(fields: [role_id], references: [id])
+
+  @@id([user_id, role_id])
+}
+
+// 菜单表
+model sys_menu {
+  id                 Int             @id @default(autoincrement())
+  title              String          @db.VarChar(50)
+  icon               String?         @db.VarChar(100)
+  path               String          @db.VarChar(125)
+  component          String?         @db.VarChar(125)
+  name               String?         @db.VarChar(100)
+  hideInMenu         Boolean         @default(false) @map("hide_in_menu")
+  parentId           Int             @default(0) @map("parent_id")
+  isIframe           Boolean         @default(false) @map("is_iframe")
+  url                String?         @db.VarChar(500)
+  affix              Boolean         @default(false)
+  hideInBreadcrumb   Boolean         @default(false) @map("hide_in_breadcrumb")
+  hideChildrenInMenu Boolean         @default(false) @map("hide_children_in_menu")
+  keepAlive          Boolean         @default(false) @map("keep_alive")
+  target             String?         @default("_blank") @db.VarChar(20)
+  redirect           String?         @db.VarChar(125)
+  menuSort           Int             @map("menu_sort")
+  permission         String?         @db.VarChar(100)
+  status             String          @default("0") @db.Char(1)
+  menuType           String?         @db.Char(1)
+  roles              sys_menu_role[]
+  createBy           String?         @map("create_by") @db.VarChar(255)
+  updateBy           String?         @map("update_by") @db.VarChar(255)
+  createTime         DateTime        @default(now()) @map("create_time")
+  updateTime         DateTime        @updatedAt @map("update_time")
+}
+
+// 菜单角色表
+model sys_menu_role {
+  menu_id Int
+  menu    sys_menu @relation(fields: [menu_id], references: [id])
+  role_id Int
+  role    sys_role @relation(fields: [role_id], references: [id])
+
+  @@id([menu_id, role_id])
+}
