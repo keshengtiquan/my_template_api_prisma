@@ -9,10 +9,11 @@ export class Result<T> {
     this.data = null
   }
 
-  static success<T>(data: T): Result<T> {
+  static success<T>(data: T, message?: string): Result<T> {
     const result = new Result<T>()
     result.data = data
     result.code = 200
+    result.message = message || 'ok'
     return result
   }
 

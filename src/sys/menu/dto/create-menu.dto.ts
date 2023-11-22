@@ -3,11 +3,12 @@ import { Type } from 'class-transformer'
 import { IsNotExistsRule } from '../../../common/rules/is-not-exist.rule'
 
 export class CreateMenuDto {
+  @IsOptional()
+  id: number
   @IsNotEmpty({ message: '菜单名称不能为空' })
   title: string
   @IsOptional()
   icon: string
-  @IsNotEmpty({ message: '菜单路径不能为空' })
   @IsNotExistsRule('sys_menu', { message: '路径重复' })
   path: string
   @IsOptional()
