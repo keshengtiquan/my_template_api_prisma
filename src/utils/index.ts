@@ -1,10 +1,21 @@
 import * as crypto from 'crypto'
+import { BadRequestException, ParseIntPipe } from '@nestjs/common'
 
+/**
+ * 字符串加密
+ * @param str 要加密的字符串
+ */
 export function md5(str) {
   const hash = crypto.createHash('md5')
   hash.update(str)
   return hash.digest('hex')
 }
+
+/**
+ *  格式化日期
+ * @param date 要格式化的日期
+ * @param format 要格式化的形式
+ */
 export function formatDate(date: Date, format: string) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -30,7 +41,6 @@ export function formatDate(date: Date, format: string) {
  */
 export const extractPathList = (tree: any[]): any => {
   if (!Array.isArray(tree)) {
-    console.warn('tree must be an array')
     return []
   }
   if (!tree || tree.length === 0) return []
@@ -194,4 +204,16 @@ export const handleTree = (data: any[], id?: string, parentId?: string, children
     }
   }
   return tree
+}
+
+/**
+ * 转数字管道
+ * @param name
+ */
+export function generateParseIntPipe(name) {
+  return new ParseIntPipe({
+    exceptionFactory() {
+      throw new BadRequestException(name + ' 应该传数字')
+    },
+  })
 }

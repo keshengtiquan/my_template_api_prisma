@@ -14,4 +14,6 @@ export interface User {
   updateBy: string
   createTime: string
   updateTime: string
+  createDept: number
+  userType: string
 }

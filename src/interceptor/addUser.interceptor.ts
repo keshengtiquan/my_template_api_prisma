@@ -10,9 +10,10 @@ export class AddUserToDtoInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest()
     const user: User = request.user // 获取当前登录用户信息
     const body = request.body
+    body.tenantId = user.tenantId
     body.createBy = user.nickName
     body.updateBy = user.nickName
-
+    body.createDept = user.createDept
     return next.handle()
   }
 }

@@ -21,6 +21,15 @@ export class AuthService {
     if (user.password !== md5(loginDto.password)) {
       throw new HttpException('密码错误', HttpStatus.BAD_REQUEST)
     }
+    if (user.status === '1') {
+      throw new HttpException('当前用户已禁用，请联系管理员', HttpStatus.BAD_REQUEST)
+    }
+    const tenant = await this.prisma.sys_tenant.findUnique({
+      where: { id: user.tenantId },
+    })
+    if (tenant.status === '1') {
+      throw new HttpException('当前租户已禁用', HttpStatus.BAD_REQUEST)
+    }
     return this.token(user)
   }
 

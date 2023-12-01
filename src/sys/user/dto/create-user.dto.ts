@@ -1,9 +1,7 @@
 import { IsNotEmpty, IsOptional } from 'class-validator'
-import { IsNotExistsRule } from '../../../common/rules/is-not-exist.rule'
 
 export class CreateUserDto {
   @IsNotEmpty({ message: '用户名不能为空' })
-  @IsNotExistsRule('sys_user', { message: '用户名已存在' })
   userName: string
 
   @IsNotEmpty({ message: '密码不能为空' })
@@ -11,4 +9,28 @@ export class CreateUserDto {
 
   @IsOptional()
   nickName: string
+  @IsOptional()
+  email: string
+  @IsOptional()
+  phoneNumber: string
+  @IsOptional()
+  gender: string
+  @IsOptional()
+  avatar: string
+  @IsOptional()
+  status: string
+  @IsOptional()
+  createDept: number
+  @IsOptional()
+  remark: string
+  @IsOptional()
+  createBy: string
+  @IsOptional()
+  updateBy: string
+  @IsOptional()
+  tenantId: number
+  @IsOptional()
+  deptId: number
+  @IsOptional()
+  roleIds: number[]
 }

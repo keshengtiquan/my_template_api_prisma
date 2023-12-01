@@ -6,6 +6,7 @@ import { AddUserToDtoInterceptor } from '../../interceptor/addUser.interceptor'
 import { UtcToLocalInterceptor } from '../../interceptor/utc2Local.interceptor'
 import { Result } from '../../common/results'
 import { UpdateMenuDto } from './dto/update-menu.dto'
+import { CurrentUser } from '../../decorators/user.dectorator'
 
 @Controller('menu')
 export class MenuController {
@@ -18,7 +19,7 @@ export class MenuController {
   @Post('/create')
   @HttpCode(200)
   @Auth()
-  @UseInterceptors(new AddUserToDtoInterceptor())
+  @UseInterceptors(AddUserToDtoInterceptor)
   async create(@Body() createMenuDto: CreateMenuDto) {
     const data = await this.menuService.create(createMenuDto)
     return Result.success(data, '菜单创建成功')
@@ -30,8 +31,8 @@ export class MenuController {
   @Get('/getMenu')
   @Auth()
   @HttpCode(200)
-  async getMenu() {
-    const data = await this.menuService.getMenu(['C', 'M'], ['0'])
+  async getMenu(@CurrentUser() currentUser: any) {
+    const data = await this.menuService.getMenu(['C', 'M'], ['0'], currentUser)
     return Result.success(data)
   }
 
@@ -41,8 +42,8 @@ export class MenuController {
   @Get('/getMenuList')
   @Auth()
   @UseInterceptors(UtcToLocalInterceptor)
-  async getMenuList() {
-    const data = await this.menuService.getMenu(['C', 'M', 'F'], ['0', '1'])
+  async getMenuList(@CurrentUser() currentUser: any) {
+    const data = await this.menuService.getMenu(['C', 'M', 'F'], ['0', '1'], currentUser)
     return Result.success(data)
   }
 
@@ -79,5 +80,17 @@ export class MenuController {
   async deleteMenuById(@Body('id') id: number) {
     const data = await this.menuService.delete(+id)
     return Result.success(data, '删除成功')
+  }
+
+  /**
+   * 禁用菜单
+   * @param id 菜单ID
+   * @param ststus 菜单状态 0 启用， 1禁用
+   */
+  @Post('/forbidden')
+  @Auth()
+  async forbiddenMenuById(@Body('id') id: number, @Body('status') status: string) {
+    const data = await this.menuService.forbidden(+id, status)
+    return Result.success(data, data.status === '1' ? '禁用成功' : '启用成功')
   }
 }

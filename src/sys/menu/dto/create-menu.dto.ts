@@ -48,4 +48,6 @@ export class CreateMenuDto {
   createBy: string
   @IsOptional()
   updateBy: string
+  @IsNotEmpty({ message: '菜单类型不能为空' })
+  menuType: string
 }

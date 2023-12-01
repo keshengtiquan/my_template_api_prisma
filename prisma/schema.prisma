@@ -7,11 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 系统用户角色
+// 系统用户
 model sys_user {
   id          Int             @id @default(autoincrement())
   tenantId    Int             @default(0) @map("tenant_id")
-  deptId      Int?            @map("dept_id")
+  userType    String          @default("") @map("user_type") @db.VarChar(10)
   userName    String          @map("user_name") @db.VarChar(30)
   nickName    String          @map("nick_name") @db.VarChar(30)
   email       String          @default("") @db.VarChar(60)
@@ -20,12 +20,14 @@ model sys_user {
   avatar      String?         @db.VarChar(255)
   password    String          @default("") @db.VarChar(100)
   status      String          @default("0") @db.Char(1)
+  createDept  Int?            @map("create_dept")
   remark      String          @default("null") @db.VarChar(500)
   createBy    String?         @map("create_by") @db.VarChar(255)
   updateBy    String?         @map("update_by") @db.VarChar(255)
   createTime  DateTime        @default(now()) @map("create_time")
   updateTime  DateTime        @updatedAt @map("update_time")
   roles       sys_user_role[]
+  deptId      Int?            @map("dept_id")
 }
 
 // 系统角色
@@ -38,6 +40,7 @@ model sys_role {
   dataScope  String          @default("1") @map("data_scope") @db.Char(1)
   status     String          @default("0") @db.Char(1)
   remark     String?         @db.VarChar(500)
+  createDept Int?            @map("create_dept")
   createBy   String?         @map("create_by") @db.VarChar(255)
   updateBy   String?         @map("update_by") @db.VarChar(255)
   createTime DateTime        @default(now()) @map("create_time")
@@ -48,12 +51,12 @@ model sys_role {
 
 // 用户角色表
 model sys_user_role {
-  user_id Int
-  user    sys_user @relation(fields: [user_id], references: [id])
-  role_id Int
-  role    sys_role @relation(fields: [role_id], references: [id])
+  userId Int      @map("user_id")
+  user   sys_user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId Int      @map("role_id")
+  role   sys_role @relation(fields: [roleId], references: [id],onDelete: Cascade)
 
-  @@id([user_id, role_id])
+  @@id([userId, roleId])
 }
 
 // 菜单表
@@ -87,10 +90,56 @@ model sys_menu {
 
 // 菜单角色表
 model sys_menu_role {
-  menu_id Int
-  menu    sys_menu @relation(fields: [menu_id], references: [id])
-  role_id Int
-  role    sys_role @relation(fields: [role_id], references: [id])
+  menuId Int      @map("menu_id")
+  menu   sys_menu @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  roleId Int      @map("role_id")
+  role   sys_role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@id([menu_id, role_id])
+  @@id([menuId, roleId])
+}
+
+// 租户表
+model sys_tenant {
+  id              Int                @id @default(autoincrement())
+  contactUserName String             @map("contact_user_name") @db.VarChar(20) //'联系人',
+  contactPhone    String             @map("contact_phone") @db.VarChar(20) //'联系电话',
+  companyName     String             @map("company_name") @db.VarChar(50) //'企业名称',
+  address         String?            @db.VarChar(125) // 地址
+  status          String             @default("0") @db.Char(1)
+  createBy        String?            @map("create_by") @db.VarChar(255)
+  updateBy        String?            @map("update_by") @db.VarChar(255)
+  createTime      DateTime           @default(now()) @map("create_time")
+  updateTime      DateTime           @updatedAt @map("update_time")
+  packageId       Int
+  package         sys_tenant_package @relation(fields: [packageId], references: [id])
+}
+
+// 租户套餐
+model sys_tenant_package {
+  id          Int          @id @default(autoincrement())
+  packageName String       @map("package_name") @db.VarChar(20)
+  remark      String?      @db.VarChar(1000)
+  menuIds     String       @map("menu_ids") @db.VarChar(3000)
+  status      String       @default("0") @db.Char(1)
+  createBy    String?      @map("create_by") @db.VarChar(255)
+  updateBy    String?      @map("update_by") @db.VarChar(255)
+  createTime  DateTime     @default(now()) @map("create_time")
+  updateTime  DateTime     @updatedAt @map("update_time")
+  sys_tenant  sys_tenant[]
+}
+
+// 部门表
+model sys_dept {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int      @default(0) @map("tenant_id")
+  parentId   Int      @default(0) @map("parent_id")
+  deptName   String   @map("dept_name") @db.VarChar(30)
+  phone      String   @default("") @db.VarChar(11)
+  email      String   @default("") @db.VarChar(50)
+  status     String   @default("0") @db.Char(1)
+  createBy   String?  @map("create_by") @db.VarChar(255)
+  updateBy   String?  @map("update_by") @db.VarChar(255)
+  createTime DateTime @default(now()) @map("create_time")
+  updateTime DateTime @updatedAt @map("update_time")
+  leader     Int
 }
